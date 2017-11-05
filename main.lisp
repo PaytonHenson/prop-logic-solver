@@ -176,8 +176,8 @@
 
 (defun convert-to-clausal-form (formula)
   (cond
-    ((atom formula) list (list formula))
-    ((= 1 (length formula)) list formula)
+    ((= 1 (length formula)) (list formula))
+    ((eq 'not (car formula)) (list formula))
     (t (let ((bindings-and (match formula '(and (? x) (? y))))
              (bindings-or (match formula '(or (? x) (? y)))))
          (cond ((not (null bindings-and)) (ccf-and formula))
@@ -205,3 +205,14 @@
                 (let ((phi (ccf-or (second (first bindings))))
                       (psi (ccf-or (second (second bindings)))))
                   (append phi psi))))))))
+
+(defun rewrite-formula (formula)
+  (convert-to-clausal-form
+    (distribute
+      (move-nots
+        (rewrite-conds formula)))))
+
+(defun rewrite-formulas (formulas)
+  (let (clauses)
+    (dolist (formula formulas clauses)
+      (setf clauses (append clauses (rewrite-formula formula))))))
