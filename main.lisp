@@ -173,3 +173,35 @@
  (do* ((start-value formula end-value)
        (end-value (rewrite-not-or (rewrite-not-and (rewrite-not-not start-value)))))
       ((equal start-value end-value) end-value)))
+
+(defun convert-to-clausal-form (formula)
+  (cond
+    ((atom formula) list (list formula))
+    ((= 1 (length formula)) list formula)
+    (t (let ((bindings-and (match formula '(and (? x) (? y))))
+             (bindings-or (match formula '(or (? x) (? y)))))
+         (cond ((not (null bindings-and)) (ccf-and formula))
+               ((not (null bindings-or)) (list (ccf-or formula))))))))
+
+(defun ccf-and (formula)
+ (cond
+   ((atom formula) (list (list formula)))
+   ((eq 'not (car formula)) (list (list formula)))
+   (t (let ((bindings-and (match formula '(and (? x) (? y))))
+            (bindings-or (match formula '(or (? x) (? y)))))
+        (cond ((not (null bindings-and))
+               (let ((phi (ccf-and (second (first bindings-and))))
+                     (psi (ccf-and (second (second bindings-and)))))
+                 (append phi psi)))
+              ((not (null bindings-or)) (list (ccf-or formula))))))))
+
+;;I know there won't be any ands
+(defun ccf-or (formula)
+  (cond
+    ((atom formula) (list formula))
+    ((eq 'not (car formula)) (list formula))
+    (t (let ((bindings (match formula '(or (? x) (? y)))))
+         (cond ((not (null bindings))
+                (let ((phi (ccf-or (second (first bindings))))
+                      (psi (ccf-or (second (second bindings)))))
+                  (append phi psi))))))))
