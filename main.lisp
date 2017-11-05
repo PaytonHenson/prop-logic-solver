@@ -88,3 +88,16 @@
                (t (list (car formula)
                         (rewrite-conds (second formula))
                         (rewrite-conds (third formula)))))))))
+
+(defun rewrite-not-not (formula)
+  (cond
+    ((atom formula) formula)
+    ((= 1 (length formula)) formula)
+    (t (let ((bindings (match formula '(not (not (? x))))))
+         (cond ((not (null bindings))
+                (rewrite-not-not (second (first bindings))))
+               ((eq 'not (car formula))
+                (list (car formula) (rewrite-not-not (second formula))))
+               (t (list (car formula)
+                        (rewrite-not-not (second formula))
+                        (rewrite-not-not (third formula)))))))))
