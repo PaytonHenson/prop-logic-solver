@@ -101,3 +101,18 @@
                (t (list (car formula)
                         (rewrite-not-not (second formula))
                         (rewrite-not-not (third formula)))))))))
+
+(defun rewrite-not-and (formula)
+  (cond
+    ((atom formula) formula)
+    ((= 1 (length formula)) formula)
+    (t (let ((bindings (match formula '(not (and (? x) (? y))))))
+         (cond ((not (null bindings))
+                (let ((phi (rewrite-not-and (second (first bindings))))
+                      (psi (rewrite-not-and (second (second bindings)))))
+                  (list 'or (list 'not phi) (list 'not psi))))
+               ((eq 'not (car formula))
+                (list (car formula) (rewrite-not-and (second formula))))
+               (t (list (car formula)
+                        (rewrite-not-and (second formula))
+                        (rewrite-not-and (third formula)))))))))
