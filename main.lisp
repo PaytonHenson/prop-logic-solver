@@ -163,3 +163,13 @@
                (t (list (car formula)
                         (dist2 (second formula))
                         (dist2 (third formula)))))))))
+
+(defun distribute (formula)
+  (do* ((start-value formula end-value)
+        (end-value (dist2 (dist1 start-value))))
+       ((equal start-value end-value) end-value)))
+
+(defun move-nots (formula)
+ (do* ((start-value formula end-value)
+       (end-value (rewrite-not-or (rewrite-not-and (rewrite-not-not start-value)))))
+      ((equal start-value end-value) end-value)))
