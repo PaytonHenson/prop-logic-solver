@@ -232,3 +232,16 @@
           (setf resolved t)
           (return)))
       (if resolved (return resolvent)))))
+
+(defun prove (clauses)
+    (do* ((proved nil)
+          (working-clauses clauses)
+          (i 1 (+ i 1))
+          (clause1 (nth i working-clauses) (nth i working-clauses)))
+         ((or (null clause1) proved) proved)
+      (dotimes (j i)
+        (let* ((clause2 (nth j working-clauses))
+               (resolvent (resolve clause1 clause2)))
+          (cond
+            ((null resolvent) (setf proved t))
+            ((not (eq resolvent 'fail)) (setf working-clauses (append working-clauses (list resolvent)))))))))
