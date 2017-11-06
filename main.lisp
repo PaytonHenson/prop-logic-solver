@@ -216,3 +216,19 @@
   (let (clauses)
     (dolist (formula formulas clauses)
       (setf clauses (append clauses (rewrite-formula formula))))))
+
+(defun negate (literal)
+  (cond
+    ((atom literal) (list 'not literal))
+    ((eq 'not (car literal)) (second literal))))
+
+(defun resolve (clause1 clause2)
+  (let ((resolvent)
+        (resolved nil))
+    (dolist (literal1 clause1 'fail)
+      (dolist (literal2 clause2)
+        (when (equal (negate literal1) literal2)
+          (setf resolvent (append (remove literal1 clause1) (remove literal2 clause2)))
+          (setf resolved t)
+          (return)))
+      (if resolved (return resolvent)))))
