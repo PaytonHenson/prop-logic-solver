@@ -166,12 +166,13 @@
 
 (defun distribute (formula)
   (do* ((start-value formula end-value)
-        (end-value (dist2 (dist1 start-value))))
+        (end-value (dist2 (dist1 start-value)) (dist2 (dist1 start-value))))
        ((equal start-value end-value) end-value)))
 
 (defun move-nots (formula)
  (do* ((start-value formula end-value)
-       (end-value (rewrite-not-or (rewrite-not-and (rewrite-not-not start-value)))))
+       (end-value (rewrite-not-or (rewrite-not-and (rewrite-not-not start-value)))
+                  (rewrite-not-or (rewrite-not-and (rewrite-not-not start-value)))))
       ((equal start-value end-value) end-value)))
 
 (defun convert-to-clausal-form (formula)
